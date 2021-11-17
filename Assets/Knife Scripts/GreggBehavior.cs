@@ -8,6 +8,7 @@ public class GreggBehavior : MonoBehaviour
 
     private Transform target;
     public float pos;
+    public bool pullBack;
 
     public int count = 0;
 
@@ -20,32 +21,50 @@ public class GreggBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (target.position.y + 1 >= this.transform.position.y || target.position.y - 1 <= this.transform.position.y)
+        Vector3 newPos = transform.position;
+
+        if (pullBack)           // automatically moving arm back
         {
-            //Stab();
-        }*/
+            speed = 10;         // pull back fast
+            newPos.x += speed * Time.deltaTime;
+            transform.position = newPos;
+        }
+        else
+        {
+            speed = 3;
 
-        movement();
+            newPos.y += speed * Time.deltaTime;
+
+            transform.position = newPos;
+
+            if(target.position.y - newPos.y >= 1 || target.position.y - newPos.y <= 1 || target.position.y == newPos.y)
+            {
+                speed = 10;     // stab fast
+                newPos.x += speed * Time.deltaTime;
+                transform.position = newPos;
+            }
+        }
+        
+        //movement();
     }
-
+    /*
     void movement()
     {
         int randRange = Random.Range(1, 30);
 
         if (randRange == 1) //|| target.position.y > this.transform.position.y)
         {
-            speed = 3;
+            speed = 4;
             transform.position = new Vector2(transform.position.x, transform.position.y + speed * Time.deltaTime);
         }
         else if (randRange == 2) //|| target.position.y < this.transform.position.y)
         {
-            speed = 3;
+            speed = 4;
             transform.position = new Vector2(transform.position.x, transform.position.y - speed * Time.deltaTime);
         }
         else if(randRange == 3)
         {
-            //Stab();
+            Stab();
         }
     }
 
@@ -59,7 +78,7 @@ public class GreggBehavior : MonoBehaviour
 
         speed = 0;
         transform.position = new Vector2(transform.position.x + 10 * Time.deltaTime, transform.position.y);
-    }
+    }*/
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -68,5 +87,28 @@ public class GreggBehavior : MonoBehaviour
             transform.position = new Vector2(pos, transform.position.y);
             count = 0;
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Vector3 newPos = transform.position;
+
+        // stop pulling back when bounds are hit
+        if (collision.gameObject.tag == "bounds")
+        {
+            pullBack = false;
+            speed = 0;
+
+            newPos.x -= 2;
+            transform.position = newPos;
+        }
+
+        if (collision.gameObject.tag == "hor bounds")
+        {
+            // bounces off the walls, changes direction
+            speed *= -1;
+        }
+
+
     }
 }

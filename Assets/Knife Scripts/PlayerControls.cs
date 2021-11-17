@@ -17,29 +17,33 @@ public class PlayerControls : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 newPos = transform.position;
+        Vector3 newPos = transform.position;        // player position
 
-        if (moveBack)
+        if (moveBack)           // automatically moving arm back
         {
-            do
-            {
-                newPos.x += speed * Time.deltaTime;
-                transform.position = newPos;
-            } while (moveBack);
-        }
-
-        UpDown();
-        
-        if (Input.GetKey(KeyCode.C))
-        {
-            newPos.x -= speed * Time.deltaTime;
+            speed = 10;         // pull back fast
+            newPos.x += speed * Time.deltaTime;
             transform.position = newPos;
         }
+        else
+        {
+            speed = 0;
 
+            UpDown();           // general controls
+        
+            if (Input.GetKey(KeyCode.C))            // to stab
+            {
+                speed = 10;     // stab fast
+                newPos.x -= speed * Time.deltaTime;
+                transform.position = newPos;
+            }
+        }
     }
 
     void UpDown()
     {
+        speed = 3;
+
         Vector3 newPos = transform.position;    // sets the vector position of the gameobject to newPos
         if (Input.GetKey(KeyCode.UpArrow))      // when you press up key
         {
@@ -52,18 +56,28 @@ public class PlayerControls : MonoBehaviour
         transform.position = newPos;            // set the vector pos to newPos at after keys are pressed
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    // collision for bound walls
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        //Vector3 newPos = transform.position;
+        Vector3 newPos = transform.position;
 
+        // stop pulling back when bounds are hit
+        if (collision.gameObject.tag == "bounds")
+        {
+            moveBack = false;
+            speed = 0;
+
+            newPos.x -= 2;
+            transform.position = newPos;
+        }
+    }
+
+    // trigger collider for bounds to stab
+    private void OnTriggerEnter2D(Collider2D other)
+    {
         if (other.gameObject.tag == "mae bounds")
         {
             moveBack = true;
-        }
-
-        if(other.gameObject.tag == "bounds")
-        {
-            moveBack = false;
         }
     }
 }

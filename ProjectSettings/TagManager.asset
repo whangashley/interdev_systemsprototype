@@ -7,6 +7,9 @@ TagManager:
   - gregg
   - bounds
   - mae bounds
+  - knifeG
+  - knifeM
+  - hor bounds
   layers:
   - Default
   - TransparentFX
